@@ -7,12 +7,13 @@ import pickle
 from nltk.stem import PorterStemmer
 ps = PorterStemmer()
 
-# load model
+# load model (trained LogisticRegression classifier)
+# This comment is here to trigger Flask auto-reload when the model file changes
 with open('static/model/model.pickle', 'rb') as f:
     model = pickle.load(f)
 
 # load stopwords
-with open('static/model/corpora/stopwords/english', 'r') as file:
+with open('static/model/corpora/stopwords/english', 'r',encoding='utf-8') as file:
     sw = file.read().splitlines()
 
 # load tokens
