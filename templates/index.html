@@ -24,10 +24,15 @@
                     <div>
                         <label for="">Negative Sentiments : {{ data.negative }}</label>
                     </div>
+                    {% if data.error %}
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {{ data.error }}
+                    </div>
+                    {% endif %}
                     <div>
                         <form method="post">
-                          <textarea name="text"></textarea>
-                          <input type="submit">
+                          <textarea name="text">{{ data.last_input }}</textarea>
+                          <input type="submit" value="Analyze">
                         </form>
                     </div>
 
@@ -38,7 +43,12 @@
                               class="commented-section mt-2">
                               <div class="d-flex flex-row align-items-center commented-user">
                                   </div>
-                                  <div class="text-nowrap bd-highlight"><span>{{ review }}</span></div>
+                                  <div class="text-nowrap bd-highlight">
+                                        <span>{{ review.text }}</span>
+                                        <span class="badge badge-pill {{ 'badge-success' if review.sentiment == 'positive' else 'badge-danger' }}">
+                                            {{ review.sentiment|capitalize }}
+                                        </span>
+                                  </div>
                                   <hr/>
                         {% endfor %}
                       </div>

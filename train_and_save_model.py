@@ -7,18 +7,31 @@ import pickle
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from collections import Counter
+from pathlib import Path
+
+from text_processing import preprocess_texts
 
 print("Loading data...")
 data = pd.read_csv('artifacts/sentiment_analysis.csv')
 
+print("Applying preprocessing pipeline...")
+clean_tweets = preprocess_texts(data['tweet'])
+
 print("Building vocabulary...")
 vocab = Counter()
-for sentence in data['tweet']:
+for sentence in clean_tweets:
     vocab.update(sentence.split())
 
-# Keep tokens that appear more than 10 times
-tokens = [key for key in vocab if vocab[key] > 10]
+# Keep tokens that appear more than the minimum frequency threshold
+MIN_TOKEN_FREQUENCY = 1
+tokens = [key for key in vocab if vocab[key] >= MIN_TOKEN_FREQUENCY]
 print(f"Vocabulary size: {len(tokens)} tokens")
+
+VOCAB_PATH = Path('static/model/vocabulary.txt')
+VOCAB_PATH.parent.mkdir(parents=True, exist_ok=True)
+with VOCAB_PATH.open('w', encoding='utf-8') as vocab_file:
+    vocab_file.write('\n'.join(tokens))
+print(f"Vocabulary saved to {VOCAB_PATH}")
 
 print("Vectorizing data...")
 def vectorizer(ds, vocabulary):
@@ -31,7 +44,7 @@ def vectorizer(ds, vocabulary):
         vectorized_lst.append(sentence_lst)
     return np.asarray(vectorized_lst, dtype=np.float32)
 
-X = vectorizer(data['tweet'], tokens)
+X = vectorizer(clean_tweets, tokens)
 y = data['label']
 
 print("Splitting data...")
